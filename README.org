@@ -1,0 +1,5 @@
+#+title: Rox
+
+This repo contains my work in progress on an implementation of Lox from a book I'm enjoying a lot called "Crafting Interpreters" by Robert Nystrom
+
+Most of the work will be on branch until its in a fitter state to be presented.
