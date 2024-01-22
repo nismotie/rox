@@ -1,3 +1,4 @@
+use std::fmt;
 use std::string::String;
 
 #[derive(Debug, Clone)]
@@ -55,7 +56,7 @@ pub enum TokenType {
 #[derive(Debug, Clone)]
 pub struct Token {
     r#type: TokenType,
-    lexeme: String,
+    pub lexeme: String,
     literal: Option<Literal>,
     line: usize,
 }
@@ -64,6 +65,21 @@ pub struct Token {
 pub enum Literal {
     String(String),
     Number(f64),
+}
+
+impl From<&Literal> for String {
+    fn from(value: &Literal) -> Self {
+        match value {
+            Literal::Number(n) => n.to_string(),
+            Literal::String(s) => s.to_string(),
+        }
+    }
+}
+
+impl fmt::Display for Literal {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", String::from(self))
+    }
 }
 
 impl Token {
