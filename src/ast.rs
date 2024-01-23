@@ -1,5 +1,6 @@
 use crate::token::{Literal, Token, TokenType};
 
+#[derive(Clone)]
 pub enum Expr {
     Binary {
         left: Box<Expr>,
@@ -38,6 +39,17 @@ impl Expr {
     }
 }
 
+pub trait Printer
+where
+    Self: Visitor<String> + Sized,
+{
+    fn parenthesize(&self, name: String, exprs: Vec<&Expr>) -> String;
+
+    fn print(&self, expr: Expr) -> String {
+        expr.accept(self)
+    }
+}
+
 struct AstPrinter;
 
 impl Visitor<String> for AstPrinter {
@@ -58,7 +70,7 @@ impl Visitor<String> for AstPrinter {
     }
 }
 
-impl AstPrinter {
+impl Printer for AstPrinter {
     fn parenthesize(&self, name: String, exprs: Vec<&Expr>) -> String {
         let mut s = String::new();
 
@@ -71,11 +83,40 @@ impl AstPrinter {
         s.push(')');
         s
     }
+}
 
-    fn print(&self, expr: Expr) -> String {
-        expr.accept(self)
+struct RpnPrinter;
+
+impl Printer for RpnPrinter {
+    fn parenthesize(&self, name: String, exprs: Vec<&Expr>) -> String {
+        let mut s = String::new();
+
+        for e in exprs {
+            s.push_str(&e.accept(self));
+            s.push(' ')
+        }
+        s.push_str(&name);
+
+        s
+    }
+}
+
+impl Visitor<String> for RpnPrinter {
+    fn visit_binary(&self, left: &Expr, operator: &Token, right: &Expr) -> String {
+        self.parenthesize(operator.lexeme.clone(), vec![left, right])
     }
 
+    fn visit_grouping(&self, expr: &Expr) -> String {
+        self.parenthesize("group".to_string(), vec![expr])
+    }
+
+    fn visit_literal(&self, literal: &Literal) -> String {
+        literal.to_string()
+    }
+
+    fn visit_unary(&self, operator: &Token, right: &Expr) -> String {
+        self.parenthesize(operator.lexeme.clone(), vec![right])
+    }
 }
 
 #[test]
@@ -91,8 +132,9 @@ fn test_print() {
         }),
     };
 
-    let printer = AstPrinter;
+    let ast_printer = AstPrinter;
+    let rpn_printer = RpnPrinter;
 
-
-    assert_eq!(printer.print(expr), "(* (- 123) (group 45.67))");
+    assert_eq!(ast_printer.print(expr.clone()), "(* (- 123) (group 45.67))");
+    assert_eq!(rpn_printer.print(expr.clone()), "123 - 45.67 group *");
 }
