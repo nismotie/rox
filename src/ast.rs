@@ -75,7 +75,6 @@ impl AstPrinter {
     fn print(&self, expr: Expr) -> String {
         expr.accept(self)
     }
-
 }
 
 #[test]
@@ -92,7 +91,6 @@ fn test_print() {
     };
 
     let printer = AstPrinter;
-
 
     assert_eq!(printer.print(expr), "(* (- 123) (group 45.67))");
 }

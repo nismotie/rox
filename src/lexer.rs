@@ -53,7 +53,7 @@ impl Lexer {
         }
 
         self.tokens.push(Token::new(
-            TokenType::EOF,
+            TokenType::Eof,
             String::from(""),
             None,
             self.line,
@@ -123,7 +123,7 @@ impl Lexer {
                 '"' => self.string(),
 
                 _ => {
-                    if c.is_digit(10) {
+                    if c.is_ascii_digit() {
                         self.number()
                     } else if self.is_alpha(c) {
                         self.identifier()
@@ -186,14 +186,14 @@ impl Lexer {
     }
 
     fn number(&mut self) {
-        while self.peek().is_digit(10) {
+        while self.peek().is_ascii_digit() {
             self.advance();
         }
 
-        if self.peek() == '.' && self.peek_next().is_digit(10) {
+        if self.peek() == '.' && self.peek_next().is_ascii_digit() {
             self.advance();
 
-            while self.peek().is_digit(10) {
+            while self.peek().is_ascii_digit() {
                 self.advance();
             }
         }
@@ -226,11 +226,11 @@ impl Lexer {
     }
 
     fn is_alpha(&self, c: char) -> bool {
-        return c.is_alphabetic() || c == '_';
+        c.is_alphabetic() || c == '_'
     }
 
     fn is_alphanum(&self, c: char) -> bool {
-        c.is_digit(10) || self.is_alpha(c)
+        c.is_ascii_digit() || self.is_alpha(c)
     }
 
     fn add_token(&mut self, t: TokenType, literal: Option<Literal>) {

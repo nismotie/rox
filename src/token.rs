@@ -1,7 +1,7 @@
 use std::fmt;
 use std::string::String;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // Char Tokens
     LeftParen,
@@ -50,14 +50,14 @@ pub enum TokenType {
     While,
 
     // Escape tokens
-    EOF,
+    Eof,
 }
 
 #[derive(Debug, Clone)]
 pub struct Token {
-    r#type: TokenType,
+    pub r#type: TokenType,
     pub lexeme: String,
-    literal: Option<Literal>,
+    pub literal: Option<Literal>,
     line: usize,
 }
 

@@ -10,6 +10,7 @@ use token::Token;
 mod lexer;
 use lexer::Lexer;
 mod ast;
+mod parser;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
